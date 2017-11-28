@@ -1,0 +1,54 @@
+doctype html
+html
+  head
+    title= title
+    | <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    | <script   src="https://code.jquery.com/jquery-3.2.1.min.js"   integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="   crossorigin="anonymous"></script>
+    | <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    | <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    //script(src="/javascripts/jquery.js")
+    //script(src="/javascripts/bootstrap.min.js")
+    //link(rel='stylesheet', href='/stylesheets/bootstrap.css')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script
+      - if(user) {
+          | var userId='#{user._id}';
+      - } else {
+          | var userId='';
+      - }
+  body
+    header
+      .menu-modal
+        .menu-modal-close
+          a.close-menu(href="#")
+            닫기
+        .menu-modal-content
+          ul
+            li
+              a(href="/") 판매 목록
+            li
+              a(href="/sell") 판매 등록
+            li
+              a(href="/mynosell") 판매 대기 목록
+            li
+              a(href="/mysell") 판매 진행중 목록
+      nav
+        .row.no-gutters
+          .logo.col-6
+            a(href="/") 북팜
+          .menu.col-6
+            a.open-menu(href="#") MENU
+    main
+      block content
+
+    script.
+      $(document).ready(function(){
+        $(".open-menu").click(function(e){
+          e.preventDefault();
+          $(".menu-modal").show();
+        });
+        $(".close-menu").click(function(e){
+          e.preventDefault();
+          $(".menu-modal").hide();
+        });
+      });

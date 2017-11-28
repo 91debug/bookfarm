@@ -1,0 +1,118 @@
+extends layout
+
+block content
+  wrapper
+    .book-nav
+      form.row.no-gutters
+        .col-3
+          select(name='searchType' class='form-control')
+            option(value='isbn' selected) ISBN
+            option(value='title') 책제목
+        .col-7
+          .padder(style='padding: 0 10px')
+            input(name="keyword" type='text', class='form-control', placeholder='검색어 입력')
+        .col-2
+          button(type='button', class='btn btn-outline-primary search-btn', style='width: 100%') 검색
+
+    .book-list.row
+
+      script.
+        var page = 0;
+        var pages = 1;
+        var searchType = 'isbn';
+        var searchKeyword = '';
+        var isLoading = false;
+        function getSells() {
+          page = page + 1;
+          var searchQuery = '';
+          if (searchKeyword !== '') {
+            searchQuery = '&searchKeyword=' + searchKeyword + '&searchType=' + searchType;
+          }
+          $.ajax({
+            type: "GET",
+            url: "/api/sells?page=" + page + "&state=SELLING" + searchQuery,
+            beforeSend: function() {
+              isLoading = true;
+            },
+            success: function(res) {
+              pages = res.pages;
+              $.each(res.docs, function(key, sell) {
+                $(".book-list").append(`
+                  <div class="col-12 sell_${sell._id}">
+                    <div class="row">
+                      <div class="col-md-6"><img class="book-image" src="${sell.book.cover}"/></div>
+                      <div class="col-md-6">
+                        <dl>
+                          <dt class="title">${sell.book.title}</dt>
+                          <dd class="publishing">${sell.book.publishing}</dd>
+                          <dd class="author">${sell.book.author}</dd>
+                          <dd class="created">${sell.createdTime}</dd>
+                          <dd class="isbn">ISBN ${sell.book.isbn}</dd>
+                          <dd>가격 <span class="price">₩ ${sell.price}</span></dd>
+                          <dd>
+                            <button data-index="${sell._id}" class="btn btn-primary buy-btn" type="button">구매요청</button>
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+                  </div>
+                `);
+              });
+              isLoading = false;
+            }
+          })
+        }
+
+        function buying(id) {
+          $.ajax({
+            type: 'PATCH',
+            url: '/api/sells/' + id,
+            data: {
+              state: 'TRADING'
+            },
+            success: function(res) {
+              alert('구매요청 완료');
+              $(".sell_" + id).remove();
+            }
+          });
+        }
+
+        function setSearchKeyword(keyword) {
+          searchKeyword = keyword;
+        }
+        function setSearchType(type) {
+          searchType = type;
+        }
+
+        $(document).ready(function(){
+          getSells();
+
+          $('.search-btn').click(function(){
+            $('.book-list').html('');
+            page = 0;
+            getSells();
+          })
+        });
+
+        $('input[name=keyword]').on('input',function(e){
+          setSearchKeyword($(this).val());
+        });
+        $('select[name=searchType]').on('change', function() {
+          setSearchType(this.value);
+        })
+
+        $(document).on("click", ".buy-btn", function() {
+          var pk = $(this).attr('data-index');
+          buying(pk);
+        });
+
+        $(window).scroll(function(){
+          if($(document).height() > $(window).height())
+          {
+            if($(window).scrollTop() == $(document).height() - $(window).height()){
+              if (pages > page && !isLoading) {
+                getSells();
+              }
+            }
+          }
+        });

@@ -1,0 +1,33 @@
+extends layout
+
+block content
+  .login-wrapper
+    .login-header
+      h1 북팜 로그인
+    .login-form
+      form
+        input(name='studentId', type='text', placeholder='아이디를 입력하세요')
+        input(name='password', type='password', placeholder='비밀번호를 입력하세요')
+        button(type='submit', class='btn btn-primary login-btn') 로그인
+        span
+          //a(href='/join') 아직 회원가입을 하지 않으셨나요? 가입하기
+  script.
+    $('form').submit(function(e){
+      e.preventDefault();
+      var params = {
+        studentId: $("input[name=studentId]").val(),
+        password: $("input[name=password]").val(),
+      };
+
+      $.ajax({
+        type: 'POST',
+        url: '/login',
+        data: params,
+        success: function(res) {
+          window.location.href = '/';
+        },
+        error: function(res) {
+          alert(res.responseJSON.message);
+        }
+      });
+    });

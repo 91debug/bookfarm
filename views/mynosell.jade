@@ -1,0 +1,62 @@
+extends layout
+
+block content
+  wrapper
+    .book-list.row
+
+      script.
+        var page = 1;
+        function getSells() {
+          $.ajax({
+            type: "GET",
+            url: "/api/sells?page=" + page + "&state=SELLING",
+            success: function(res) {
+              console.log(res);
+              $.each(res.docs, function(key, sell) {
+                $(".book-list").append(`
+                  <div class="col-12 sell_${sell._id}">
+                    <div class="row">
+                      <div class="col-md-6"><img class="book-image" src="${sell.book.cover}"/></div>
+                      <div class="col-md-6">
+                        <dl>
+                          <dt class="title">${sell.book.title}</dt>
+                          <dd>가격 <span class="price">₩ ${sell.price}</span></dd>
+                          <dd>
+                            <button data-index="${sell._id}" class="btn btn-primary delete-btn" type="button">거래 삭제</button>
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+                  </div>
+                `);
+              });
+            }
+          })
+        }
+        function del(id) {
+          $.ajax({
+            type: 'DELETE',
+            url: '/api/sells/' + id,
+            success: function(res) {
+              alert('판매요청 삭제');
+              $(".sell_" + id).remove();
+            }
+          });
+        }
+
+        $(document).ready(function(){
+          getSells();
+        });
+
+        $(document).on("click", ".complete-btn", function() {
+          var pk = $(this).attr('data-index');
+          buying(pk);
+        });
+        $(document).on("click", ".delete-btn", function() {
+          var pk = $(this).attr('data-index');
+          del(pk);
+        });
+        $(document).on("click", ".fail-btn", function() {
+          var pk = $(this).attr('data-index');
+          fail(pk);
+        });

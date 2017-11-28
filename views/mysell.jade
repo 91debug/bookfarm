@@ -1,0 +1,94 @@
+extends layout
+
+block content
+  wrapper
+    .book-list.row
+
+      script.
+        var page = 1;
+        function getSells() {
+          $.ajax({
+            type: "GET",
+            url: "/api/sells?page=" + page + "&state=TRADING",
+            success: function(res) {
+              console.log(res.docs);
+              $.each(res.docs, function(key, sell) {
+                $(".book-list").append(`
+                  <div class="col-12 sell_${sell._id}">
+                    <div class="row">
+                      <div class="col-md-6"><img class="book-image" src="${sell.book.cover}"/></div>
+                      <div class="col-md-6">
+                        <dl>
+                          <dt class="title">${sell.book.title}</dt>
+                          <dd>구매자 정보</dd>
+                          <dd>${sell.buyer.studentId}</dd>
+                          <dd>${sell.buyer.username}</dd>
+                          <dd>${sell.buyer.phone}</dd>
+                          <dd>
+                            <button data-index="${sell._id}" class="btn btn-primary complete-btn" type="button">거래 완료</button>
+                            <button data-index="${sell._id}" class="btn btn-primary fail-btn" type="button">거래 실패</button>
+                            <button data-index="${sell._id}" class="btn btn-primary delete-btn" type="button">거래 삭제</button>
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+                  </div>
+                `);
+              });
+            }
+          })
+        }
+
+        function buying(id) {
+          $.ajax({
+            type: 'PATCH',
+            url: '/api/sells/' + id,
+            data: {
+              state: 'COMPLETED'
+            },
+            success: function(res) {
+              alert('거래 완료');
+              $(".sell_" + id).remove();
+            }
+          });
+        }
+        function fail(id) {
+          $.ajax({
+            type: 'PATCH',
+            url: '/api/sells/' + id,
+            data: {
+              state: 'SELLING'
+            },
+            success: function(res) {
+              alert('거래 실패처리하여, 다시 판매중 상태가됩니다.');
+              $(".sell_" + id).remove();
+            }
+          });
+        }
+        function del(id) {
+          $.ajax({
+            type: 'DELETE',
+            url: '/api/sells/' + id,
+            success: function(res) {
+              alert('판매요청 삭제');
+              $(".sell_" + id).remove();
+            }
+          });
+        }
+
+        $(document).ready(function(){
+          getSells();
+        });
+
+        $(document).on("click", ".complete-btn", function() {
+          var pk = $(this).attr('data-index');
+          buying(pk);
+        });
+        $(document).on("click", ".delete-btn", function() {
+          var pk = $(this).attr('data-index');
+          del(pk);
+        });
+        $(document).on("click", ".fail-btn", function() {
+          var pk = $(this).attr('data-index');
+          fail(pk);
+        });

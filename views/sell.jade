@@ -1,0 +1,89 @@
+extends layout
+
+block content
+  .sell-wrapper
+    .sell-header
+      h1 판매 등록
+
+    .sell-isbn
+       form
+        .form-group
+          label(for="") ISBN
+          input.form-control(type="text" name="isbn")
+        .form-group
+          button(type="button", class="btn btn-primary get-isbn") 정보 가져오기
+
+    .sell-info
+      form
+        input.form-control(type="hidden" name="cover")
+        .form-group
+          label(for="") 책 제목
+          input.form-control(type="text" name="title")
+        .form-group
+          label(for="") 책 출판사
+          input.form-control(type="text" name="publishing")
+        .form-group
+          label(for="") 책 지은이
+          input.form-control(type="text" name="author")
+        .form-group
+          label(for="") 책 가격
+          input.form-control(type="text" name="price")
+        .form-group
+          button(type="button", class="btn btn-primary add-sell") 판매 등록
+
+
+    script.
+      var apiKey = "164306269d621dda9871210afac3e434";
+
+      $(document).ready(function(){
+        $(".add-sell").click(function(){
+          var isbn = $("input[name=isbn]").val(),
+              title = $("input[name=title]").val(),
+              author = $("input[name=author]").val(),
+              publishing = $("input[name=publishing]").val(),
+              cover = $("input[name=cover]").val(),
+              price = $("input[name=price]").val();
+
+          var params = {
+            book: {
+              isbn: isbn,
+              title: title,
+              author: author,
+              publishing: publishing,
+              cover: cover,
+            },
+            price: price
+          }
+
+          $.ajax({
+            type: 'POST',
+            url: '/api/sells',
+            dataType: 'json',
+            contentType: "application/json",
+            data: JSON.stringify(params),
+            success: function(res) {
+              window.location.href = "/";
+            },
+            error: function(res) {
+              alert('등록 실패');
+            }
+          })
+        });
+
+        $(".get-isbn").click(function(){
+          var isbn = $("input[name=isbn]").val();
+          var url = "https://apis.daum.net/search/book?searchType=isbn&apikey=" + apiKey + "&q=" + isbn + "&output=json"
+
+          $.ajax({
+            type: 'GET',
+            url: url,
+            dataType: "jsonp",
+            success: function(res) {
+              $("input[name=title]").val(res.channel.item[0].title);
+              $("input[name=publishing]").val(res.channel.item[0].pub_nm);
+              $("input[name=author]").val(res.channel.item[0].author);
+              $("input[name=cover]").val(res.channel.item[0].cover_l_url);
+            }
+          })
+        });
+      });
