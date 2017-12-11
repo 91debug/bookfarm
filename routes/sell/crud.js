@@ -81,37 +81,6 @@ router.patch('/:pk', (req, res) => {
       if (saveErr) {
         return res.status(500).json({});
       }
-      if (params.state === 'TRADING') {
-        // send push
-        const devOptions = {
-          gateway: 'gateway.sandbox.push.apple.com',
-          cert: './cert.pem',
-          key: './key.pem',
-          production: false,
-        };
-
-        // APNS Connection
-        const apnConnection = new apn.Provider(devOptions);
-
-
-        // Notification setting
-        const note = new apn.Notification();
-        note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-        note.badge = 1;
-        note.sound = 'ping.aiff';
-        note.alert = '구매 요청이 들어왔습니다, 마이페이지를 확인하세요';
-        note.payload = { messageFrom: '북팜' };
-
-
-        try {
-          apnConnection.send(note, sell.user.pushToken).then((ret) => {
-            console.log(ret);
-            return res.json({ state: saveSell });
-          });
-        } catch (e) {
-          return res.status(500).json({});
-        }
-      }
       return res.json({ state: saveSell });
     });
   });

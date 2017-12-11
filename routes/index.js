@@ -1,6 +1,5 @@
 const express = require('express');
 const passport = require('passport');
-const http = require('http');
 const https = require('https');
 const Authentication = require('../utils/authentication');
 
@@ -44,13 +43,13 @@ router.get('/auth', (req, res) => {
   });
 });
 router.get('/join', (req, res) => {
-  const id = req.query.id;
-  const token = req.query.token;
+  //const id = req.query.id;
+  //const token = req.query.token;
 
-  if (typeof id !== 'undefined') {
-    return res.render('join', { title: '회원가입', id, token });
-  }
-  return res.render('login', { title: '로그인' });
+  ///if (typeof id !== 'undefined') {
+    return res.render('join', { title: '회원가입' });
+  //}
+  //return res.render('login', { title: '로그인' });
 });
 router.get('/login', (req, res) => res.render('login', { title: '로그인' }));
 router.get('/sell', (req, res) => res.render('sell', { title: '판매등록' }));

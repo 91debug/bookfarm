@@ -5,9 +5,8 @@ block content
     .login-header
       h1 NSU 북팜 가입하기
     .login-form
-      span #{id}학번으로 가입됩니다.
       form
-        input(name='studentId', type='hidden', value='#{id}')
+        input(name='studentId', type='text', placeholder='학번을 입력하세요')
         input(name='token', type='hidden', value='#{token}')
         input(name='department', type='text', placeholder='학과를 입력하세요')
         input(name='username', type='text', placeholder='이름을 입력하세요')
@@ -35,7 +34,7 @@ block content
         data: params,
         success: function(res) {
           alert("가입 완료, 다시 로그인 해 주세요");
-          window.location = 'bookfarm://gologin';
+          window.location = '/login';
         },
         error: function(res) {
           alert(res.responseJSON.message);
